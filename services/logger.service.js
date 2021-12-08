@@ -15,12 +15,10 @@ function getTime() {
 
 
 function isError(e) {
-    return e && e.stack && e.message;
+    return e && e.stack && e.message
 }
 
 function doLog(level, ...args) {
-
-    // console.log('LOGGER:', args);
     const strs = args.map(arg =>
         (typeof arg === 'string' || isError(arg)) ? arg : JSON.stringify(arg)
     )

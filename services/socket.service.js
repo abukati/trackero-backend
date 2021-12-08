@@ -1,5 +1,5 @@
-const asyncLocalStorage = require('./als.service');
-const logger = require('./logger.service');
+const asyncLocalStorage = require('./als.service')
+const logger = require('./logger.service')
 
 var gIo = null
 
@@ -15,7 +15,7 @@ function connectSockets(http, session) {
             console.log('Someone disconnected')
         })
         socket.on('chat topic', topic => {
-            if (socket.myTopic === topic) return;
+            if (socket.myTopic === topic) return
             if (socket.myTopic) {
                 socket.leave(socket.myTopic)
             }
@@ -23,7 +23,7 @@ function connectSockets(http, session) {
             socket.myTopic = topic
         })
         socket.on('chat newMsg', msg => {
-            console.log('Emitting Chat msg', msg);
+            console.log('Emitting Chat msg', msg)
             // emits to all sockets:
             // gIo.emit('chat addMsg', msg)
             // emits only to sockets in the same room
@@ -53,14 +53,14 @@ async function emitToUser({ type, data, userId }) {
     const socket = await _getUserSocket(userId)
     if (socket) socket.emit(type, data)
     else {
-        console.log('User socket not found');
-        _printSockets();
+        console.log('User socket not found')
+        _printSockets()
     }
 }
 
 // Send to all sockets BUT not the current socket 
 async function broadcast({ type, data, room = null, userId }) {
-    console.log('BROADCASTING', JSON.stringify(arguments));
+    console.log('BROADCASTING', JSON.stringify(arguments))
     const excludedSocket = await _getUserSocket(userId)
     if (!excludedSocket) {
         // logger.debug('Shouldnt happen, socket not found')
@@ -76,14 +76,14 @@ async function broadcast({ type, data, room = null, userId }) {
 }
 
 async function _getUserSocket(userId) {
-    const sockets = await _getAllSockets();
+    const sockets = await _getAllSockets()
     const socket = sockets.find(s => s.userId == userId)
-    return socket;
+    return socket
 }
 async function _getAllSockets() {
     // return all Socket instances
-    const sockets = await gIo.fetchSockets();
-    return sockets;
+    const sockets = await gIo.fetchSockets()
+    return sockets
 }
 // function _getAllSockets() {
 //     const socketIds = Object.keys(gIo.sockets.sockets)
