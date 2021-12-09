@@ -45,7 +45,6 @@ async function getByUsername(username) {
     try {
         const collection = await dbService.getCollection('user')
         const user = await collection.findOne({ username })
-        console.log('mongo user', user);
         return user
     } catch (err) {
         logger.error(`while finding user ${username}`, err)
