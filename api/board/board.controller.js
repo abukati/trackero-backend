@@ -49,7 +49,7 @@ async function addBoard(req, res) {
     try {
         var board = req.body
         board = await boardService.save(board)
-        socketService.broadcast({type: 'board-added', data: board})
+        // socketService.broadcast({type: 'board-added', data: board})
         res.send(board)
     } catch (err) {
         console.log(err)

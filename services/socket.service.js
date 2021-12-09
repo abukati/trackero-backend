@@ -17,9 +17,9 @@ function connectSockets(http, session) {
             if (socket.handshake) gSocketBySessionIdMap[socket.handshake.sessionID] = null
         })
 
-        socket.on('user endSession', userId => {
-            if (userId) gIo.emit('user disconnected', userId)
-        })
+        // socket.on('user endSession', userId => {
+        //     if (userId) gIo.emit('user disconnected', userId)
+        // })
 
         socket.on('join board', boardId => {
             if (socket.boardId === boardId) return
@@ -30,11 +30,11 @@ function connectSockets(http, session) {
             socket.boardId = boardId
         })
 
-        socket.on('user-watch', userId => {
-            socket.join(userId)
-            socket.userId = userId
-            gIo.emit(socket.userId).emit('New notification', msg)
-        })
+        // socket.on('user-watch', userId => {
+        //     socket.join(userId)
+        //     socket.userId = userId
+        //     gIo.emit(socket.userId).emit('New notification', msg)
+        // })
 
         socket.on('app activity', activity => {
             if (activity.card.members) {
@@ -68,11 +68,11 @@ async function emitToUser({ type, data, userId }) {
 
 // Send to all sockets BUT not the current socket 
 async function broadcast({ type, data, room = null }) {
-    const excludedSocket = await _getUserSocket(userId)
-    if (!excludedSocket) {
-        return;
-    }
-    logger.debug('broadcast to all but user: ', userId)
+    // const excludedSocket = await _getUserSocket(userId)
+    // if (!excludedSocket) {
+    //     return;
+    // }
+    // logger.debug('broadcast to all but user: ', userId)
     if (room) {
         excludedSocket.broadcast.to(room).emit(type, data)
     } else {
