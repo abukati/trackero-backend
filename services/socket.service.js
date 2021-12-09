@@ -2,49 +2,57 @@ const asyncLocalStorage = require('./als.service')
 const logger = require('./logger.service')
 
 var gIo = null
+var gSocketBySessionIdMap = {}
 
 function connectSockets(http, session) {
-    gIo = require('socket.io')(http, {
-        cors: {
-            origin: '*',
-        }
-    })
+    gIo = require('socket.io')(http, { cors: { origin: '*' } })
+
+    const sharedSession = require('express-socket.io-session')
+    gIo.use(sharedSession(session, { autoSave: true }))
+
     gIo.on('connection', socket => {
-        console.log('New socket', socket.id)
-        socket.on('disconnect', socket => {
-            console.log('Someone disconnected')
+        gSocketBySessionIdMap[socket.handshake.sessionID] = socket
+
+        socket.on('disconnect', () => {
+            if (socket.handshake) gSocketBySessionIdMap[socket.handshake.sessionID] = null
         })
-        socket.on('chat topic', topic => {
-            if (socket.myTopic === topic) return
-            if (socket.myTopic) {
-                socket.leave(socket.myTopic)
+
+        socket.on('user endSession', userId => {
+            if (userId) gIo.emit('user disconnected', userId)
+        })
+
+        socket.on('join board', boardId => {
+            if (socket.boardId === boardId) return
+            if (socket.boardId) {
+                socket.leave(socket.boardId)
             }
-            socket.join(topic)
-            socket.myTopic = topic
+            socket.join(boardId)
+            socket.boardId = boardId
         })
-        socket.on('chat newMsg', msg => {
-            console.log('Emitting Chat msg', msg)
-            // emits to all sockets:
-            // gIo.emit('chat addMsg', msg)
-            // emits only to sockets in the same room
-            gIo.to(socket.myTopic).emit('chat addMsg', msg)
-        })
+
         socket.on('user-watch', userId => {
-            socket.join('watching:' + userId)
-        })
-        socket.on('set-user-socket', userId => {
-            logger.debug(`Setting (${socket.id}) socket.userId = ${userId}`)
+            socket.join(userId)
             socket.userId = userId
+            gIo.emit(socket.userId).emit('New notification', msg)
         })
-        socket.on('unset-user-socket', () => {
-            delete socket.userId
+
+        socket.on('app activity', activity => {
+            if (activity.card.members) {
+                activity.card.members.forEach(member => {
+                    if (member._id !== activity.byMember._id) gIo.to(member._id).emit('app activity', activity)
+                })
+            }
+        })
+
+        socket.on('board update', savedBoard => {
+            socket.to(socket.boardId).emit('board update', savedBoard)
         })
 
     })
 }
 
-function emitTo({ type, data, label }) {
-    if (label) gIo.to('watching:' + label).emit(type, data)
+function emitTo({ type, data, room = null }) {
+    if (room) gIo.to(room).emit(type, data)
     else gIo.emit(type, data)
 }
 
@@ -59,12 +67,9 @@ async function emitToUser({ type, data, userId }) {
 }
 
 // Send to all sockets BUT not the current socket 
-async function broadcast({ type, data, room = null, userId }) {
-    console.log('BROADCASTING', JSON.stringify(arguments))
+async function broadcast({ type, data, room = null }) {
     const excludedSocket = await _getUserSocket(userId)
     if (!excludedSocket) {
-        // logger.debug('Shouldnt happen, socket not found')
-        // _printSockets();
         return;
     }
     logger.debug('broadcast to all but user: ', userId)
