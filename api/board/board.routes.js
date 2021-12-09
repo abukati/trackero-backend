@@ -11,12 +11,12 @@ const router = express.Router()
 
 router.get('/', getBoards)
 
-router.get('/:id', getBoard)
+router.get('/:boardId', getBoard)
 // router.post('/', requireAuth, requireAdmin, addBoard)
 router.post('/', addBoard)
-// router.put('/:id', requireAuth, requireAdmin, updateBoard)
-router.put('/:id', updateBoard)
-// router.delete('/:id', requireAuth, requireAdmin, removeBoard)
-router.delete('/:id', deleteBoard)
+// router.put('/:boardId', requireAuth, requireAdmin, updateBoard)
+router.put('/:boardId', updateBoard)
+// router.delete('/:boardId', requireAuth, requireAdmin, removeBoard)
+router.delete('/:boardId', deleteBoard)
 
 module.exports = router

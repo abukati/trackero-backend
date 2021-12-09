@@ -12,7 +12,6 @@ async function query(filterBy = {}) {
         logger.error('cannot find boards', err)
         throw err
     }
-
 }
 
 async function save(board) {
@@ -51,6 +50,8 @@ async function save(board) {
                 groups: [],
                 activities: [],
             }
+            // TODO: ADD BOARD
+
         } catch(err) {
             logger.error('cannot add board', err)
             throw err
@@ -104,7 +105,7 @@ async function add(review) {
 function _buildCriteria(filterBy) {
     const criteria = {}
     const { ctg } = filterBy
-    return criteria
+    return ctg
 }
 
 module.exports = {
