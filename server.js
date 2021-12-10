@@ -17,11 +17,9 @@ const session = expressSession({
 })
 
 app.use(session)
-app.use(express.static('public'))
-
-app.use(express.static('public'))
-app.use(cookieParser())
+app.use(express.static(path.resolve(__dirname, 'public')))
 app.use(express.json())
+app.use(cookieParser())
 
 if (process.env.NODE_ENV === 'production') {
    app.use(express.static(path.resolve(__dirname, 'public')))
@@ -32,7 +30,14 @@ if (process.env.NODE_ENV === 'production') {
    })
 } else {
    const corsOptions = {
-      origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000'],
+      origin: [
+         'http://127.0.0.1:8080',
+         'http://localhost:8080',
+         'http://127.0.0.1:8081',
+         'http://localhost:8081',
+         'http://127.0.0.1:3000',
+         'http://localhost:3000'
+      ],
       credentials: true
    }
    app.use(cors(corsOptions))
@@ -41,7 +46,7 @@ if (process.env.NODE_ENV === 'production') {
 const authRoutes = require('./api/auth/auth.routes')
 const userRoutes = require('./api/user/user.routes')
 const boardRoutes = require('./api/board/board.routes')
-// const { connectSockets } = require('./services/socket.service')
+const { connectSockets } = require('./services/socket.service')
 
 // routes
 const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
@@ -50,7 +55,7 @@ app.all('*', setupAsyncLocalStorage)
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/board', boardRoutes)
-// connectSockets(http, session)
+connectSockets(http, session)
 
 // Make every server-side-route to match the index.html
 // so when requesting http://localhost:3030/index.html/car/123 it will still respond with

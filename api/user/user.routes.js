@@ -7,10 +7,10 @@ const router = express.Router()
 // router.use(requireAuth)
 
 router.get('/', getUsers)
-router.get('/:id', getUser)
-router.put('/:id', requireAuth,  updateUser)
+router.get('/:userId', getUser)
+router.put('/:userId', requireAuth,  updateUser)
 
-// router.put('/:id',  requireAuth, updateUser)
-router.delete('/:id',  requireAuth, requireAdmin, deleteUser)
+// router.put('/:userId',  requireAuth, updateUser)
+router.delete('/:userId',  requireAuth, requireAdmin, deleteUser)
 
 module.exports = router

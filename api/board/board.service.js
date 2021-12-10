@@ -39,17 +39,18 @@ async function save(board) {
    } else {
       try {
          savedBoard = {
-            createdAt: ObjectId(board._id).getTimestamp(),
-            title: board.title,
-            createdBy: board.createdBy,
-            style: {
-               background: board.background
-            },
-            labels: [],
-            members: [board.createdBy],
-            groups: [],
-            activities: []
+            createdAt: ObjectId().getTimestamp(),
+            title,
+            createdBy,
+            style,
+            labels,
+            members: [createdBy],
+            groups,
+            activities
          }
+         const collection = await dbService.getCollection('board')
+         await collection.insertOne(savedBoard)
+         return savedBoard
       } catch (err) {
          logger.error('cannot add board', err)
          throw err
@@ -101,8 +102,8 @@ async function add(review) {
 
 function _buildCriteria(filterBy) {
    const criteria = {}
-   // const { ctg } = filterBy
-   return criteria
+   const { ctg } = filterBy
+   return ctg
 }
 
 module.exports = {
