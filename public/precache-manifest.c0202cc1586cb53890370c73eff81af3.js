@@ -200,7 +200,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/workspace-icon.16611ee3.svg"
   },
   {
-    "revision": "f718cbb43f149f56675cc85636455ec3",
+    "revision": "fa7968e6f5fd40dc7e0698cc8b063918",
     "url": "/index.html"
   },
   {

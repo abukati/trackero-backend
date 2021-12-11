@@ -18,6 +18,7 @@ const session = expressSession({
 app.use(session)
 app.use(express.json())
 app.use(cookieParser())
+// app.use(express.static('public'))
 
 if (process.env.NODE_ENV === 'production') {
    app.use(express.static(path.resolve(__dirname, 'public')))
@@ -28,7 +29,6 @@ if (process.env.NODE_ENV === 'production') {
    }
    app.use(cors(corsOptions))
 }
-
 
 const authRoutes = require('./api/auth/auth.routes')
 const userRoutes = require('./api/user/user.routes')
