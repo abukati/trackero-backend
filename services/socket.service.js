@@ -17,13 +17,10 @@ function connectSockets(http, session) {
       socket.on('disconnect', () => {
          if (socket.handshake) gSocketBySessionIdMap[socket.handshake.sessionID] = null
       })
-
       socket.on('user endSession', userId => {
          if (userId) gIo.emit('user disconnected', userId)
       })
-
       socket.on('user logout', userId => gIo.emit('user logged out', userId))
-
       socket.on('set-user-socket', userId => {
          if (socket.userId === userId) return
          if (socket.userId) socket.leave(socket.userId)
@@ -48,18 +45,11 @@ function connectSockets(http, session) {
          if (socket.boardId) socket.leave(socket.boardId)
          socket.join(boardId)
          socket.boardId = boardId
-         console.log('boardid socket',socket.boardId);
       })
-
-      socket.on('boardUpdate', boardId => {
-         console.log('boardid update socket',socket.boardId);
-         console.log('boardid update socket',boardId);
-         socket.broadcast.emit('boardUpdate', boardId)
-         // console.log(gIo.sockets.emit('boardUpdate', boardId))
-         // socket.broadcast('boardUpdate',boardId)
-      })
+      socket.on('boardUpdate', boardId => socket.broadcast.emit('boardUpdate', boardId))
    })
 }
+
 
 function emitTo({ type, data, room = null }) {
    if (room) gIo.to(room).emit(type, data)
@@ -77,20 +67,6 @@ async function emitToUser({ type, data, userId }) {
 
 // Send to all sockets BUT not the current socket
 async function broadcast({ type, data, room = null }) {
-   // console.log('user',user);
-   // console.log('type',type);
-   // console.log('data',data);
-   // console.log('room',room);
-   // const excludedSocket = await _getUserSocket(userId)
-   // // if (!excludedSocket) {
-   // //     return;
-   // // }
-   // logger.debug('broadcast to all but user: ', userId)
-   // if (room) {
-   //    excludedSocket.broadcast.to(room).emit(type, data)
-   // } else {
-   //    excludedSocket.broadcast.emit(type, data)
-   // }
    const store = asyncLocalStorage.getStore()
    const { sessionId } = store
    if (!sessionId) return logger.debug('Shoudnt happen, no sessionId in asyncLocalStorage store')
@@ -105,11 +81,6 @@ async function _getUserSocket(userId) {
    const socket = sockets.find(s => s.userId == userId)
    return socket
 }
-// async function _getAllSockets() {
-//     // return all Socket instances
-//     const sockets = await gIo.fetchSockets()
-//     return sockets
-// }
 
 async function _getAllSockets() {
    const socketIds = Object.keys(gIo.sockets.sockets)
