@@ -16,31 +16,19 @@ const session = expressSession({
 })
 
 app.use(session)
-app.use(express.static(path.resolve(__dirname, 'public')))
 app.use(express.json())
 app.use(cookieParser())
 
 if (process.env.NODE_ENV === 'production') {
    app.use(express.static(path.resolve(__dirname, 'public')))
-   app.use((req, res, next) => {
-      if (req.header('x-forwarded-proto') !== 'https') {
-         res.redirect(`https://${req.header('host')}${req.url}`)
-      } else next()
-   })
 } else {
    const corsOptions = {
-      origin: [
-         'http://127.0.0.1:8080',
-         'http://localhost:8080',
-         'http://127.0.0.1:8081',
-         'http://localhost:8081',
-         'http://127.0.0.1:3000',
-         'http://localhost:3000'
-      ],
-      credentials: true
+       origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000'],
+       credentials: true
    }
    app.use(cors(corsOptions))
 }
+
 
 const authRoutes = require('./api/auth/auth.routes')
 const userRoutes = require('./api/user/user.routes')
