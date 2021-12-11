@@ -83,23 +83,6 @@ async function remove(boardId) {
    }
 }
 
-async function add(review) {
-   try {
-      // peek only updatable fields!
-      const reviewToAdd = {
-         byUserId: ObjectId(review.byUserId),
-         aboutUserId: ObjectId(review.aboutUserId),
-         txt: review.txt
-      }
-      const collection = await dbService.getCollection('review')
-      await collection.insertOne(reviewToAdd)
-      return reviewToAdd
-   } catch (err) {
-      logger.error('cannot insert review', err)
-      throw err
-   }
-}
-
 function _buildCriteria(filterBy) {
    const criteria = {}
    const { ctg } = filterBy
@@ -109,7 +92,6 @@ function _buildCriteria(filterBy) {
 module.exports = {
    query,
    remove,
-   add,
    getById,
    save
 }

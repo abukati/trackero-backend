@@ -11,31 +11,32 @@ function connectSockets(http, session) {
     gIo.use(sharedSession(session, { autoSave: true }))
 
     gIo.on('connection', socket => {
+        console.log('New socket - socket.handshake.sessionID', socket.handshake.sessionID)
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
+
+        if (socket.handshake?.session?.user) socket.join(socket.handshake.session.user._id) // might delete
 
         socket.on('disconnect', () => {
             if (socket.handshake) gSocketBySessionIdMap[socket.handshake.sessionID] = null
         })
 
-        // socket.on('user endSession', userId => {
-        //     if (userId) gIo.emit('user disconnected', userId)
-        // })
+        socket.on('user endSession', userId => {
+            if (userId) gIo.emit('user disconnected', userId)
+        })
+
+        socket.on('user logout', userId => gIo.emit('user logged out', userId))
 
         socket.on('join board', boardId => {
             if (socket.boardId === boardId) return
-            if (socket.boardId) {
-                socket.leave(socket.boardId)
-            }
+            if (socket.boardId) socket.leave(socket.boardId)
             socket.join(boardId)
             socket.boardId = boardId
         })
-
-        // socket.on('user-watch', userId => {
-        //     socket.join(userId)
-        //     socket.userId = userId
-        //     gIo.emit(socket.userId).emit('New notification', msg)
-        // })
-
+        socket.on('user-watch', userId => {
+            socket.join(userId)
+            socket.userId = userId
+            gIo.emit(socket.userId).emit('New notification', msg)
+        })
         socket.on('app activity', activity => {
             if (activity.card.members) {
                 activity.card.members.forEach(member => {
@@ -43,9 +44,9 @@ function connectSockets(http, session) {
                 })
             }
         })
-
-        socket.on('board update', savedBoard => {
-            socket.to(socket.boardId).emit('board update', savedBoard)
+        socket.on('boardUpdate', savedBoard => {
+            console.log('boardUpdate ', socket)
+            socket.to(socket).emit('boardUpdate', savedBoard)
         })
 
     })
@@ -96,6 +97,7 @@ async function _getAllSockets() {
 //     return sockets;
 // }
 
+_printSockets()
 async function _printSockets() {
     const sockets = await _getAllSockets()
     console.log(`Sockets: (count: ${sockets.length}):`)
