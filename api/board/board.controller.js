@@ -48,12 +48,9 @@ async function updateBoard(req, res) {
 async function addBoard(req, res) {
     try {
         var board = req.body
-        console.log(board);
         board = await boardService.save(board)
-        // socketService.broadcast({type: 'board-added', data: board})
         res.send(board)
     } catch (err) {
-        console.log(err)
         logger.error('Failed to add board', err)
         res.status(500).send({ err: 'Failed to add board' })
     }
