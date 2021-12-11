@@ -54,7 +54,7 @@ function connectSockets(http, session) {
       socket.on('boardUpdate', boardId => {
          console.log('boardid update socket',socket.boardId);
          console.log('boardid update socket',boardId);
-         socket.emit('boardUpdate', boardId)
+         socket.broadcast.emit('boardUpdate', boardId)
          // console.log(gIo.sockets.emit('boardUpdate', boardId))
          // socket.broadcast('boardUpdate',boardId)
       })
