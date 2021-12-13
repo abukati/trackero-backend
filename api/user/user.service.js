@@ -64,7 +64,7 @@ async function remove(userId) {
 
 async function update(user) {
    try {
-      const { username, fullname, imgUrl, mentions, subscribedTo, starredBoardsIds, isAdmin } = user
+      const { username, fullname, imgUrl, mentions, subscribedTo, starredBoards, isAdmin } = user
       const userToSave = {
          _id: ObjectId(user._id),
          username,
@@ -72,7 +72,7 @@ async function update(user) {
          imgUrl,
          mentions,
          subscribedTo,
-         starredBoardsIds,
+         starredBoards,
          isAdmin
       }
       const collection = await dbService.getCollection('user')
@@ -94,7 +94,7 @@ async function add(user) {
          imgUrl: user.imgUrl,
          mentions: user.mentions,
          subscribedTo: user.subscribedTo,
-         starredBoardsIds: user.starredBoardsIds,
+         starredBoards: user.starredBoards,
          isAdmin: user.isAdmin
       }
       const collection = await dbService.getCollection('user')
