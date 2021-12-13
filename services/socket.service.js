@@ -11,7 +11,6 @@ function connectSockets(http, session) {
    gIo.use(sharedSession(session, { autoSave: true }))
 
    gIo.on('connection', socket => {
-      console.log(socket.handshake.sessionID);
       gSocketBySessionIdMap[socket.handshake.sessionID] = socket
 
       socket.on('disconnect', () => {
@@ -26,7 +25,6 @@ function connectSockets(http, session) {
          if (socket.userId) socket.leave(socket.userId)
          socket.join(userId)
          socket.userId = userId
-         console.log('userid socket',socket.userId);
       })
       socket.on('user-watch', userId => {
          socket.join(userId)
@@ -93,7 +91,7 @@ async function _printSockets() {
    sockets.forEach(_printSocket)
 }
 function _printSocket(socket) {
-   console.log(`Socket - socketId: ${socket.id} sessionID: ${socket.sessionID}`)
+   // console.log(`Socket - socketId: ${socket.id} sessionID: ${socket.sessionID}`)
 }
 
 module.exports = {
